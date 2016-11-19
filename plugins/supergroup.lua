@@ -30,6 +30,7 @@ local function check_member_super(cb_extra, success, result)
 		  member = 'no',
 		  public = 'no',
 		  lock_rtl = 'no',
+		  lock_fwd = 'no',
 		  lock_tgservice = 'yes',
 		  lock_contacts = 'no',
 		  strict = 'no'
@@ -216,6 +217,34 @@ local function unlock_group_links(msg, data, target)
     data[tostring(target)]['settings']['lock_link'] = 'no'
     save_data(_config.moderation.data, data)
     return 'Link posting has been unlocked'
+  end
+end
+
+local function lock_group_fwd(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_fwd_lock = data[tostring(target)]['settings']['lock_fwd']
+  if group_fwd_lock == 'yes' then
+    return '<b>Forward Msg is already locked!</b>'
+  else
+    data[tostring(target)]['settings']['lock_fwd'] = 'yes'
+    save_data(_config.moderation.data, data)
+    return '<i>Forward Msg has been locked</i>'
+  end
+end
+
+local function unlock_group_fwd(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_fwd_lock = data[tostring(target)]['settings']['lock_fwd']
+  if group_fwd_lock == 'no' then
+    return '<b>Forward Msg is already unlocked</b>'
+  else
+    data[tostring(target)]['settings']['lock_fwd'] = 'no'
+    save_data(_config.moderation.data, data)
+    return '<i>Forward Msg has been unlocked</i>'
   end
 end
 
@@ -562,6 +591,11 @@ function show_supergroup_settingsmod(msg, target)
 			data[tostring(target)]['settings']['lock_rtl'] = 'no'
 		end
 end
+	if data[tostring(target)]['settings'] then
+		if not data[tostring(target)]['settings']['lock_fwd'] then
+			data[tostring(target)]['settings']['lock_fwd'] = 'no'
+		end
+end
       if data[tostring(target)]['settings'] then
 		if not data[tostring(target)]['settings']['lock_tgservice'] then
 			data[tostring(target)]['settings']['lock_tgservice'] = 'no'
@@ -573,7 +607,7 @@ end
 		end
 	end
   local settings = data[tostring(target)]['settings']
-  local text = "SuperGroup settings:\nLock links : "..settings.lock_link.."\nLock flood: "..settings.flood.."\nFlood sensitivity : "..NUM_MSG_MAX.."\nLock spam: "..settings.lock_spam.."\nLock Arabic: "..settings.lock_arabic.."\nLock Member: "..settings.lock_member.."\nLock RTL: "..settings.lock_rtl.."\nLock Tgservice : "..settings.lock_tgservice.."\nLock sticker: "..settings.lock_sticker.."\nPublic: "..settings.public.."\nStrict settings: "..settings.strict
+  local text = "<b>SuperGroup settings</b>:\n\n<i>>>Lock Links</i>: "..settings.lock_link.."\n<i>>>Lock Flood</i>: "..settings.flood.."\n<i>>>Lock Forward(fwd)</i>: "..settings.lock_fwd.."\n<i>>>Flood sensitivity</i> : "..NUM_MSG_MAX.."\n<i>>>Lock spam</i>: "..settings.lock_spam.."\n<i>>>Lock Arabic</i>: "..settings.lock_arabic.."\n<i>>>Lock Member</i>: "..settings.lock_member.."\n<i>>>Lock RTL</i>: "..settings.lock_rtl.."\n<i>>>Lock Tgservice</i> : "..settings.lock_tgservice.."\n<i>>>Lock sticker</i>: "..settings.lock_sticker.."\n<i>>>Public</i>: "..settings.public.."\n<i>>>Strict settings</i>: "..settings.strict.."\n\n<b>Mega Maximus</b>\n<b>Bot Version</b>:<i>2.3</i>\n\n<b>Made by</b>:@Osson_Poxo_Ye"
   return text
 end
 
@@ -1670,6 +1704,10 @@ local function run(msg, matches)
 				savelog(msg.to.id, name_log.." ["..msg.from.id.."] locked spam ")
 				return lock_group_spam(msg, data, target)
 			end
+			if matches[2] == 'forward' then
+				savelog(msg.to.id, name_log.." ["..msg.from.id.."] locked Forward Msg ")
+				return lock_group_fwd(msg, data, target)
+			end
 			if matches[2] == 'flood' then
 				savelog(msg.to.id, name_log.." ["..msg.from.id.."] locked flood ")
 				return lock_group_flood(msg, data, target)
@@ -1726,6 +1764,9 @@ local function run(msg, matches)
 				savelog(msg.to.id, name_log.." ["..msg.from.id.."] unlocked member ")
 				return unlock_group_membermod(msg, data, target)
 			end
+			if matches[2] == 'forward' then
+				savelog(msg.to.id, name_log.." ["..msg.from.id.."] unlocked Forward Msg")
+				return unlock_group_fwd(msg, data, target)
 			if matches[2]:lower() == 'rtl' then
 				savelog(msg.to.id, name_log.." ["..msg.from.id.."] unlocked RTL chars. in names")
 				return unlock_group_rtl(msg, data, target)
