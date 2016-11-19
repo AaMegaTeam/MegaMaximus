@@ -261,8 +261,8 @@ end
 	if matches[1] == 'reload' then
 		receiver = get_receiver(msg)
 		reload_plugins(true)
-		post_msg(receiver, "Reloaded!", ok_cb, false)
-		return "Reloaded!"
+		post_msg(receiver, "", ok_cb, false)
+		return "<b>Bot Has Been Reloaded BY :</b>@"..msg.from.username.."\n\n<i>All Plugins Reloaded!!</i>\n<i>All Changes Saved</i>\n\n<b>MegaMaximus Is Ready Now!!!</b>"
 	end
 	--[[*For Debug*
 	if matches[1] == "vardumpmsg" and is_admin1(msg) then
