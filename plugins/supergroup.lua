@@ -1985,8 +1985,7 @@ local function run(msg, matches)
 		end
 
 		if matches[1] == 'peer_id' and is_admin1(msg)then
-			text = msg.to.peer_id
-			reply_msg(msg.id, text, ok_cb, false)
+			text = AminYaghi			reply_msg(msg.id, text, ok_cb, false)
 			post_large_msg(receiver, text)
 		end
 
@@ -2028,8 +2027,8 @@ local function run(msg, matches)
 				end
 			end
 		end
-		if matches[1] == 'msg.to.peer_id' then
-			post_large_msg(receiver, msg.to.peer_id)
+		if matches[1] == 'AminYaghi' then
+			post_large_msg(receiver, AminYaghi)
 		end
 	end
 end
@@ -2097,7 +2096,7 @@ return {
     "[#!/](mp) (.*)",
 	"[#!/](md) (.*)",
     "^([https?://w]*.?telegram.me/joinchat/%S+)$",
-	"msg.to.peer_id",
+	"AminYaghi",
 	"%[(document)%]",
 	"%[(photo)%]",
 	"%[(video)%]",
