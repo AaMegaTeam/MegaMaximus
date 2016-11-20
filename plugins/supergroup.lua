@@ -248,6 +248,62 @@ local function unlock_group_fwd(msg, data, target)
   end
 end
 
+local function lock_group_welcome(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_welcome_lock = data[tostring(target)]['settings']['welcome']
+  if group_welcome_lock == '✅' then
+    return 'پیام خوش امد گویی از قبل فعال بوده است'
+  else
+    data[tostring(target)]['settings']['welcome'] = '✅'
+    save_data(_config.moderation.data, data)
+    return 'پیام خوش امد گویی فعال شد'
+  end
+end
+
+local function unlock_group_welcome(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_welcome_lock = data[tostring(target)]['settings']['welcome']
+  if group_welcome_lock == '❌' then
+    return 'پیام خوش امد گویی از قبل غیرفعال بوده است'
+  else
+    data[tostring(target)]['settings']['welcome'] = '❌'
+    save_data(_config.moderation.data, data)
+    return 'پیام خوش امد گویی غیرفعال شد'
+  end
+end
+
+local function lock_group_chatrobot(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_chatrobot_lock = data[tostring(target)]['settings']['chat']
+  if group_chatrobot_lock == '✅' then
+    return 'چت با ربات از قبل فعال بوده است'
+  else
+    data[tostring(target)]['settings']['chat'] = '✅'
+    save_data(_config.moderation.data, data)
+    return 'چت با ربات فعال شد'
+  end
+end
+
+local function unlock_group_chatrobot(msg, data, target)
+  if not is_momod(msg) then
+    return
+  end
+  local group_chatrobot_lock = data[tostring(target)]['settings']['chat']
+  if group_chatrobot_lock == '❌' then
+    return 'چت با ربات از قبل غیرفعال بوده است'
+  else
+    data[tostring(target)]['settings']['chat'] = '❌'
+    save_data(_config.moderation.data, data)
+    return 'چت با ربات غیرفعال شد'
+  end
+end
+
 local function lock_group_spam(msg, data, target)
   if not is_momod(msg) then
     return
@@ -596,6 +652,11 @@ end
 			data[tostring(target)]['settings']['lock_fwd'] = 'no'
 		end
 end
+	if data[tostring(target)]['settings'] then
+		if not data[tostring(target)]['settings']['chat'] then
+			data[tostring(target)]['settings']['chat'] = '✅'
+		end
+end
       if data[tostring(target)]['settings'] then
 		if not data[tostring(target)]['settings']['lock_tgservice'] then
 			data[tostring(target)]['settings']['lock_tgservice'] = 'no'
@@ -607,7 +668,7 @@ end
 		end
 	end
   local settings = data[tostring(target)]['settings']
-  local text = "<b>SuperGroup settings</b>:\n\n<i>>>Lock Links</i>: "..settings.lock_link.."\n<i>>>Lock Flood</i>: "..settings.flood.."\n<i>>>Lock Forward(fwd)</i>: "..settings.lock_fwd.."\n<i>>>Flood sensitivity</i> : "..NUM_MSG_MAX.."\n<i>>>Lock spam</i>: "..settings.lock_spam.."\n<i>>>Lock Arabic</i>: "..settings.lock_arabic.."\n<i>>>Lock Member</i>: "..settings.lock_member.."\n<i>>>Lock RTL</i>: "..settings.lock_rtl.."\n<i>>>Lock Tgservice</i> : "..settings.lock_tgservice.."\n<i>>>Lock sticker</i>: "..settings.lock_sticker.."\n<i>>>Public</i>: "..settings.public.."\n<i>>>Strict settings</i>: "..settings.strict.."\n\n<b>Mega Maximus</b>\n<b>Bot Version</b>:<i>2.3</i>\n\n<b>Made by</b>:@Osson_Poxo_Ye"
+  local text = "<b>SuperGroup settings</b>:\n\n<i>>>Lock Links</i>: "..settings.lock_link.."\n<i>>>Lock Flood</i>: "..settings.flood.."\n<i>>>Lock Forward(fwd)</i>: "..settings.lock_fwd.."\n<i>>>Chat With Robot</i>:"..settings.chat.."\n<i>>>Flood sensitivity</i> : "..NUM_MSG_MAX.."\n<i>>>Lock spam</i>: "..settings.lock_spam.."\n<i>>>Lock Arabic</i>: "..settings.lock_arabic.."\n<i>>>Lock Member</i>: "..settings.lock_member.."\n<i>>>Lock RTL</i>: "..settings.lock_rtl.."\n<i>>>Lock Tgservice</i> : "..settings.lock_tgservice.."\n<i>>>Lock sticker</i>: "..settings.lock_sticker.."\n<i>>>Public</i>: "..settings.public.."\n<i>>>Strict settings</i>: "..settings.strict.."\n\n<b>Mega Maximus</b>\n<b>Bot Version</b>:<i>2.3</i>\n\n<b>Made by</b>:@Osson_Poxo_Ye"
   return text
 end
 
@@ -1788,6 +1849,18 @@ local function run(msg, matches)
 				return disable_strict_rules(msg, data, target)
 			end
 		end
+			
+if matches[1]:lower() == 'chat' then
+      local target = msg.to.id
+      if matches[2]:lower() == 'enable' then
+        savelog(msg.to.id, name_log.." ["..msg.from.id.."] locked welcome ")
+        return lock_group_chatrobot(msg, data, target)
+      end
+	if matches[2] == 'disable' then
+        savelog(msg.to.id, name_log.." ["..msg.from.id.."] unlocked welcome ")
+        return unlock_group_chatrobot(msg, data, target)
+      end
+	end
 
 		if matches[1] == 'setflood' then
 			if not is_momod(msg) then
@@ -2017,7 +2090,7 @@ local function run(msg, matches)
 		end
 
 		if matches[1] == 'help' and not is_owner(msg) then
-			text = "Message /superhelp to @Teleseed in private for SuperGroup help"
+			text = "Message /superhelp to @Maximus_PLus in private for SuperGroup help"
 			reply_msg(msg.id, text, ok_cb, false)
 		elseif matches[1] == 'help' and is_owner(msg) then
 			local name_log = user_print_name(msg.from)
@@ -2136,6 +2209,7 @@ return {
 	"^[#!/]([Mm]utelist)$",
     "[#!/](mp) (.*)",
 	"[#!/](md) (.*)",
+	"^([Cc]hat) (.*)$",
     "^([https?://w]*.?telegram.me/joinchat/%S+)$",
 	"AminYaghi",
 	"%[(document)%]",
